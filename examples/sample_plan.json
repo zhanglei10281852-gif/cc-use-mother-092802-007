@@ -1,0 +1,101 @@
+{
+  "data": {
+    "assets": [
+      {"asset_id": "line-7", "asset_kind": "transmission_line", "serves": [], "upstream_asset_ids": []},
+      {"asset_id": "line-9", "asset_kind": "transmission_line", "serves": [], "upstream_asset_ids": ["line-7"]},
+      {"asset_id": "sub-1", "asset_kind": "substation", "serves": ["shelter-1", "shelter-2"], "upstream_asset_ids": ["line-9"]},
+      {"asset_id": "sub-2", "asset_kind": "substation", "serves": ["shelter-3"], "upstream_asset_ids": ["line-9"]},
+      {"asset_id": "radial-3", "asset_kind": "feeder", "serves": ["shelter-4"], "upstream_asset_ids": ["sub-2"]}
+    ],
+    "service_points": [
+      {"point_id": "shelter-1", "name": "一号避险点", "population": 1200, "criticality": 1.5},
+      {"point_id": "shelter-2", "name": "二号避险点", "population": 800, "criticality": 1.0},
+      {"point_id": "shelter-3", "name": "三号避险点", "population": 2000, "criticality": 2.0},
+      {"point_id": "shelter-4", "name": "四号避险点", "population": 300, "criticality": 1.0}
+    ],
+    "scenarios": [
+      {
+        "scenario_id": "ice-avalanche",
+        "name": "山地冰崩（道路与走廊同毁）",
+        "frequency_per_year": 0.2,
+        "failure_probs": [
+          ["line-7", 0.6],
+          ["line-9", 0.45],
+          ["sub-1", 0.25],
+          ["sub-2", 0.25],
+          ["radial-3", 0.15]
+        ],
+        "default_failure_prob": 0.0
+      },
+      {
+        "scenario_id": "ice-storm",
+        "name": "常规覆冰",
+        "frequency_per_year": 0.8,
+        "failure_probs": [
+          ["line-7", 0.15],
+          ["line-9", 0.2],
+          ["sub-1", 0.1],
+          ["sub-2", 0.1],
+          ["radial-3", 0.2]
+        ],
+        "default_failure_prob": 0.0
+      }
+    ],
+    "repair": {
+      "repair_days": [
+        ["line-7", 30],
+        ["line-9", 20],
+        ["sub-1", 14],
+        ["sub-2", 14],
+        ["radial-3", 7]
+      ],
+      "bypass_days": [
+        ["line-7", 12],
+        ["line-9", 8]
+      ]
+    },
+    "candidates": [
+      {
+        "project_id": "p-line7-tower",
+        "asset_id": "line-7",
+        "name": "7 号线抗冰塔加固",
+        "cost": "180",
+        "crew_days": 25,
+        "prerequisite_ids": [],
+        "residual_failure_factor": 0.2,
+        "bypass_after_days": 5,
+        "repair_days_reduction": 10
+      },
+      {
+        "project_id": "p-sub1-bypass",
+        "asset_id": "sub-1",
+        "name": "1 号变站旁路与基础加固",
+        "cost": "90",
+        "crew_days": 12,
+        "prerequisite_ids": ["p-line7-tower"],
+        "residual_failure_factor": 0.3,
+        "bypass_after_days": 3
+      },
+      {
+        "project_id": "p-sub2-harden",
+        "asset_id": "sub-2",
+        "name": "2 号变站加固",
+        "cost": "110",
+        "crew_days": 18,
+        "prerequisite_ids": [],
+        "residual_failure_factor": 0.3
+      },
+      {
+        "project_id": "p-radial3-recloser",
+        "asset_id": "radial-3",
+        "name": "辐射线重合闸与融冰改造",
+        "cost": "30",
+        "crew_days": 6,
+        "prerequisite_ids": ["p-sub2-harden"],
+        "residual_failure_factor": 0.2
+      }
+    ],
+    "resources": {"budget": "300", "crew_teams": 2, "horizon_days": 60}
+  },
+  "weights": {"risk": 1.0, "restoration": 1.0, "dependency": 0.5}
+}
